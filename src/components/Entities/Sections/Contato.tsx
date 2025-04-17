@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import ContactBanner from "../../../assets/Contact us-bro.svg";
 
@@ -8,29 +8,27 @@ const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export default function ContatoSection() {
   const form = useRef<HTMLFormElement>(null);
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" | null }>({
+    text: "",
+    type: null,
+  });
 
   function sendEmail(e: React.FormEvent) {
     e.preventDefault();
 
     if (form.current) {
-      emailjs
-        .sendForm(
-          serviceID,
-          templateID,
-          form.current,
-          publicKey
-        )
-        .then(
-          () => {
-            alert("Mensagem enviada com sucesso!");
-            form.current?.reset();
-          },
-          (error) => {
-            alert("Ocorreu um erro ao enviar: " + error.text);
-          }
-        );
+      emailjs.sendForm(serviceID, templateID, form.current, publicKey).then(
+        () => {
+          setMessage({ text: "Mensagem enviada com sucesso!", type: "success" });
+          form.current?.reset();
+        },
+        (error) => {
+          setMessage({ text: "Ocorreu um erro ao enviar. Tente novamente mais tarde.", type: "error" });
+          console.error("Erro ao enviar o e-mail:", error);
+        }
+      );
     }
-  };
+  }
 
   return (
     <section
@@ -97,6 +95,17 @@ export default function ContatoSection() {
                 >
                   Enviar
                 </button>
+
+                {/* Mensagem de status abaixo do botão */}
+                {message.text && (
+                  <span
+                    className={`block mt-2 text-sm font-medium ${
+                      message.type === "success" ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {message.text}
+                  </span>
+                )}
               </fieldset>
             </form>
           </div>
