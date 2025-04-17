@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+html {
+    scroll-behavior: smooth;
+}
+
+::selection { 
+    @apply bg-emerald-900
+}
